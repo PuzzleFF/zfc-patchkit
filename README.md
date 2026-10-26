@@ -69,14 +69,23 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/combo.json \
 4. **R8 输入固定**：输入必须是钉死 SHA-256 的官方镜像
 5. **整包 CRC 不变式**：重算模块 CRC 后，整包 CRC 必须仍是 `0xC023`
 
-## 明确的边界（别再重复的弯路）
+## 参考与致谢
 
-| 方向 | 结论 |
-|---|---|
-| 普通录像 30 分钟 | **结案**。限制方不读时长表；改表 / 改可见代码都碰不到（三轮实机 + 全量静态分析） |
-| 720p 码率 | **无意义**。Z fc 没有 1280×720 规格，表里 `rec20–23` 不可达 |
-| 4K / 1080p100/120 的「标准」画质 | 掩码 `+0x10` 低字节控制"列几个档"，改成 `3` 能让选项出现但仍不可选 —— 第二道门在设置子系统，且收益是**更低**码率 |
-| 尾部 12.4 KB 零区当代码空间 | **不可用**，26 个指针指向它 |
+本项目的**方法**来自 [Wonder Lantern（Nikon Z30 固件扩展项目）](https://github.com/WonderLantern/wonder-lantern-z30)。
+它把"往固件模块里停放新代码 + 把既有调用重定向过去"这条路走通了（项目里叫 `CAPACITY`），
+并在此之上做出了一整套功能：自定义菜单、画幅遮罩、全信息页、快门音、机内码率档位、
+照片取景斑马纹、模块宿主等。本仓库的三个功能里有几个直接受益于它的结论：
+
+- **独立 EG 模块的安装路径**（改模块 → 重算 CRC16 → `EG1985??.BIN` → SD 卡 → 相机自身升级）
+- **`ldr.w pc` 跳板**这句写法（把 N 字节窗口换成"远跳 + 字面量"）
+- **把配置存到 SD 卡**而不是写进固件的思路
+
+Z30 与 Z fc 是同一代 EXPEED 6 平台，但**函数级地址不能照搬** —— 同一处代码在两个机型上的
+位移都不是常数（我们实测同一处 `bl` 的目标位移与门本身的位移相差 `0xDC`）。所以本仓库里
+Z fc 的每一个地址、数据表与验证结果都是重新定位、独立实测的。
+
+其他参考：[NikonUnlock](https://github.com/summershrimp/NikonUnlock)（服务模式语言解锁协议）、
+[nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools)（容器解包的 XOR 表）。
 
 ## 免责声明
 
@@ -120,6 +129,30 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/combo.json \
 Equal-length replacement only; module boundary and directory untouched; nothing but the
 declared bytes and the module CRC may change; input pinned by SHA-256; the container CRC
 invariant (`0xC023`) must still hold.
+
+## Prior art and credits
+
+The *method* comes from [Wonder Lantern](https://github.com/WonderLantern/wonder-lantern-z30),
+a Nikon Z30 firmware-extension project. It established the technique of parking new code in
+the firmware module and redirecting existing calls into it (called `CAPACITY` there), and
+built a whole feature set on top: custom menus, aspect masks, a full-info display, shutter
+sounds, in-camera bitrate profiles, photo-mode zebra and a module host. Several pieces here
+follow directly from its findings:
+
+- the **standalone EG-module install path** (patch the module → recompute CRC16 →
+  `EG1985??.BIN` → SD card → the camera's own updater)
+- the **`ldr.w pc` trampoline** that turns an N-byte window into a far jump plus a literal
+- the idea of **keeping configuration on the SD card** instead of inside the firmware
+
+The Z30 and the Z fc share the EXPEED 6 generation, but **function-level addresses cannot be
+transplanted**: the same code site shifts by a different amount in each model (we measured a
+`bl` target offset differing from the gate offset by `0xDC`). Every Z fc address, table and
+verification result in this repository was re-located and measured independently.
+
+Also referenced: [NikonUnlock](https://github.com/summershrimp/NikonUnlock) for the
+service-mode language-unlock protocol, and
+[nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools) for the
+container XOR tables.
 
 ## Disclaimer
 

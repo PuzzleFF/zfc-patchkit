@@ -1,0 +1,64 @@
+{
+ "patches": [
+  {
+   "offset": 7303708,
+   "expected": "003fab01",
+   "replacement": "007e5603",
+   "note": "bitrate rec7 field+0x14: 28 -> 56 Mbps"
+  },
+  {
+   "offset": 7303712,
+   "expected": "00366e01",
+   "replacement": "006cdc02",
+   "note": "bitrate rec7 field+0x18: 24 -> 48 Mbps"
+  },
+  {
+   "offset": 7303764,
+   "expected": "003fab01",
+   "replacement": "007e5603",
+   "note": "bitrate rec9 field+0x14: 28 -> 56 Mbps"
+  },
+  {
+   "offset": 7303768,
+   "expected": "00366e01",
+   "replacement": "006cdc02",
+   "note": "bitrate rec9 field+0x18: 24 -> 48 Mbps"
+  },
+  {
+   "offset": 7303820,
+   "expected": "809fd500",
+   "replacement": "003fab01",
+   "note": "bitrate rec11 field+0x14: 14 -> 28 Mbps"
+  },
+  {
+   "offset": 7303824,
+   "expected": "001bb700",
+   "replacement": "00366e01",
+   "note": "bitrate rec11 field+0x18: 12 -> 24 Mbps"
+  },
+  {
+   "offset": 7303876,
+   "expected": "809fd500",
+   "replacement": "003fab01",
+   "note": "bitrate rec13 field+0x14: 14 -> 28 Mbps"
+  },
+  {
+   "offset": 7303880,
+   "expected": "001bb700",
+   "replacement": "00366e01",
+   "note": "bitrate rec13 field+0x18: 12 -> 24 Mbps"
+  },
+  {
+   "offset": 7303932,
+   "expected": "809fd500",
+   "replacement": "003fab01",
+   "note": "bitrate rec15 field+0x14: 14 -> 28 Mbps"
+  },
+  {
+   "offset": 7303936,
+   "expected": "001bb700",
+   "replacement": "00366e01",
+   "note": "bitrate rec15 field+0x18: 12 -> 24 Mbps"
+  }
+ ]
+}

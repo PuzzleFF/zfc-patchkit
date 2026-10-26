@@ -1,0 +1,38 @@
+[
+ {
+  "label": "stock",
+  "spec": "patches/stock.json",
+  "sha256": "cd47efc126ce5e4ce98fe95bcfe30089a07e86d7f256a4eb0df2f6bc6e9233e3",
+  "note": "原厂模块 + CRC（回滚基线）"
+ },
+ {
+  "label": "slowmo25",
+  "spec": "patches/slowmo25.json",
+  "sha256": "4a6feaa42c43c7c79be5659ec7549b845bb28586ea30c87692a4eb01b5486dee",
+  "note": "慢动作上限 3 -> 25 分钟"
+ },
+ {
+  "label": "bitrate-a",
+  "spec": "patches/bitrate-a.json",
+  "sha256": "34c26114878ec886a3dc47f6537036170803906f282a10b22e8fe8464d81ba00",
+  "note": "1080p 标准档提到原高档值"
+ },
+ {
+  "label": "bitrate-b",
+  "spec": "patches/bitrate-b.json",
+  "sha256": "3a3a6823a1baf0df3cfecbb2946d88a69604bf067d77389ac3b0170e0ec6d949",
+  "note": "1080p 高档再提一档（60/50p -> 84/70）"
+ },
+ {
+  "label": "zebra-photo",
+  "spec": "patches/zebra-photo.json",
+  "sha256": "79c80d6176088fa3ab7f4487b8aa45b219c1b6e700454626b8a5178f09e75293",
+  "note": "照片取景斑马纹（复用原厂加亮显示设置）"
+ },
+ {
+  "label": "zfc-v1",
+  "spec": "patches/combo.json",
+  "sha256": "2c9cc3a91d49f8c1430b3d3f172c79aa197cf84a9b583682dfc4818d731ec161",
+  "note": "正式版：慢动作 25 分钟 + bitrate-b + 斑马纹"
+ }
+]

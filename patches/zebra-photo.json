@@ -1,0 +1,16 @@
+{
+ "patches": [
+  {
+   "offset": 1402334,
+   "expected": "9db1",
+   "replacement": "00bf",
+   "note": "gate A effective-pattern @0x101765DE: cbz r5,reject -> nop"
+  },
+  {
+   "offset": 1402634,
+   "expected": "9db1",
+   "replacement": "00bf",
+   "note": "gate B availability @0x1017670A: cbz r5,reject -> nop"
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+# No Nikon firmware is redistributed with this kit
+*.bin
+*.BIN
+Z_fc_*.bin
+
+# build output
+build/
+out/
+
+# python
+__pycache__/
+*.pyc

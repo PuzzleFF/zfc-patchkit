@@ -1,0 +1,10 @@
+{
+ "patches": [
+  {
+   "offset": 2622576,
+   "expected": "20bf0200",
+   "replacement": "60e31600",
+   "note": "slowmo25: slow-motion 3 min -> 25 min (0x102A0470)"
+  }
+ ]
+}

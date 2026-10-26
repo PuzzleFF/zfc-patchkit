@@ -1,0 +1,18 @@
+# Normalize line endings.
+#
+# Repository content AND working trees use LF, regardless of the contributor's
+# local core.autocrlf setting. Without this, Windows users (autocrlf=true) get
+# CRLF working copies and everyone sees spurious diffs.
+* text=auto eol=lf
+
+# Windows-only scripts must keep CRLF or they will not run.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Never treat binaries as text: no conversion, no textual diff.
+*.bin binary
+*.BIN binary
+*.exe binary
+*.png binary
+*.jpg binary

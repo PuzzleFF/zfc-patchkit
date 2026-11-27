@@ -8,9 +8,9 @@
 
 | 领域 | 候选版行为 | 实测归因与审查边界 |
 |---|---|---|
-| **普通录像（125 分钟）** | 菜单上限 `125:00`（`unlock2`） | 机主在 `zfc_all1b` 上仅测短录像（未报告异常），**未测超过 30 分钟录像**。更早的 `34:32` / `3.1 GB` 记录来自早期 `unlock2` / `VIDEO1` 版本（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 与 `CFW@b6d4d04:research/nikon_zfc/snapshots/zfc-v2-20261127/README.md`，公开仓未附单组件原始日志）；125 分钟满程、4 GiB 边界与 4K 长录均未验证 |
+| **普通录像（125 分钟）** | 菜单上限 `125:00`（`unlock2`） | 机主在 `zfc_all1b` 上仅测短录像（未报告异常），**未测超过 30 分钟录像**。历史汇总报告记录了普通录像 `34:32` / `3.1 GB`，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 与 `CFW@b6d4d04:research/nikon_zfc/snapshots/zfc-v2-20261127/README.md`，公开仓未附单组件原始日志）；125 分钟满程、4 GiB 边界与 4K 长录均未验证 |
 | **慢动作（25 分钟）** | 菜单上限 `25:00`（`slowmo25`） | 更早的 `10` 分钟记录来自 `slowmo25`（固定出处：`zfc-patchkit@10d619b:CHANGELOG.md`、`docs/MILESTONE-2026-10-25.md`）；25 分钟满程未验证 |
-| **视频品质与码率（`qs8`）** | 解锁品质菜单（高 / 标准）+ `qmenu_rates` | **`zfc_all1b` 未测不同画质档位的码率**。更早的 5 种 MP4 模式记录来自早期 `qs8` 组件（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`，公开仓未附单组件原始日志）；MOV 未测；全局解锁可能暴露原厂隐藏项 |
+| **视频品质与码率（`qs8`）** | 解锁品质菜单（高 / 标准）+ `qmenu_rates` | **`zfc_all1b` 未测不同画质档位的码率**。历史汇总报告记录了 5 种 MP4 模式，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`，公开仓未附单组件原始日志）；MOV 未测；全局解锁可能暴露原厂隐藏项 |
 | **自定义画幅与遮罩** | 5 档新增画幅（去 5:4，单页 8 项）、LCD/EVF 纯黑遮罩（EVF UI 保留 + 4 像素突发加速）、免重启回放放大、视频档自动隐藏遮罩 | 机主在 `zfc_all1b` 上实测拍照、画幅遮罩及**切到视频档自动隐藏 / 切回拍照档恢复**未报告异常 |
 | **静音模式自定义快门声** | 5 槽固定 WAV，选中自动试听 | 机主在 `zfc_all1b` 上实测自定义快门声未报告异常（限于机主测试环境）；早期 `extsnd1` / `extboot1` 缺少对应独立实机测试报告（该部分历史归因：**尚未确认**） |
 | **扩展菜单与独立拍照斑马纹** | 设定菜单底部统一入口（冷启动直显文字）+ 独立拍照斑马纹 | **尚未确认**：`zfc_all1b` 本轮初测记录未单独涵盖这两项；早期 `extmenu1b` / `extsnd1` / `extboot1` 仅在 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 有总述，缺少独立实机测试报告文件 |

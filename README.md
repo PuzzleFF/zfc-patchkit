@@ -35,9 +35,9 @@
 | **慢动作上限 3 → 25 分钟** | 菜单时长上限设为 `25:00`（`0x102A0470`） | 更早的 `10` 分钟录像记录来自 `slowmo25`（固定出处：`zfc-patchkit@10d619b:CHANGELOG.md`、`docs/MILESTONE-2026-10-25.md`）；`25` 分钟满程未验证 |
 | **4K / 1080p 品质与码率菜单** | 解锁视频品质菜单（高 / 标准）+ `qmenu_rates` | **`zfc_all1b` 未测不同画质档位的码率**。历史汇总报告记录了 5 种 MP4 模式，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`，公开仓未附单组件原始日志）；MOV 未测 |
 | **自定义画幅套件 + EVF 加速 + 视频档自动隐藏** | 新增 5 档画幅（去 5:4，单页 8 项）、LCD/EVF 纯黑遮罩（保留 EVF UI、4 像素突发加速）、免重启回放放大、视频档自动隐藏遮罩 | 机主在 `zfc_all1b` 上实测拍照、画幅遮罩及**切到视频档自动隐藏 / 切回拍照档恢复**未报告异常 |
-| **静音模式自定义快门声** | 5 个固定 WAV 槽位（选中自动试听） | 机主在 `zfc_all1b` 上实测自定义快门声未报告异常；早期 `extsnd1` / `extboot1` 仅有 `zfc-research@e77cb5c` 总述、缺少对应独立实机测试报告（该部分历史归因：**尚未确认**） |
-| **统一设定菜单入口 + 独立拍照斑马纹** | 设定菜单底部扩展入口（冷启动直显文字）+ 独立拍照斑马纹 | **尚未确认**：`zfc_all1b` 本轮初测记录未单独涵盖这两项；早期 `extmenu1b` / `extsnd1` / `extboot1` 仅在 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 有总述，缺少对应的独立实机测试报告文件 |
-| **单文件配置与开机自恢复** | 统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复 | **尚未确认**：`zfc_all1b` 的「开关机正常」观察仅覆盖开关机本身，不等价于配置自恢复实测；`zfc-research@e77cb5c:notes/EXTBOOT1-REPORT.md` 为刷前离线报告（`camera_verified: false`），缺少 `extboot1` / `zfc_all1b` 的配置恢复独立实机报告 |
+| **静音模式自定义快门声** | 5 个固定 WAV 槽位（选中自动试听） | 机主在 `zfc_all1b` 上实测自定义快门声未报告异常，也补充确认早期 `extsnd1` / `extboot1` 的快门声已实机测试。早期版本的逐项原始日志尚未归档 |
+| **统一设定菜单入口 + 独立拍照斑马纹** | 设定菜单底部扩展入口（冷启动直显文字）+ 独立拍照斑马纹 | 机主补充确认在 `zfc_all1b` 上实机测试了统一设定菜单入口和独立拍照斑马纹。早期构建的逐项结果应以各自记录为准 |
+| **单文件配置与开机自恢复** | 统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复 | 机主补充确认在 `zfc_all1b` 上单独实机测试了开机配置自恢复。`zfc-research@e77cb5c:notes/EXTBOOT1-REPORT.md` 是早期构建的刷前离线报告 |
 
 ## 快速开始
 
@@ -93,7 +93,7 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
 
 - **Owner initial test on `zfc_all1b`** (photo-focused): power cycling (covers power-on/off only), still photography, custom aspect-ratio masks (including Movie-mode auto-hide and Photo-mode restore), custom shutter sound, and short video clips reported no issues.
 - **Untested on `zfc_all1b`**: recordings longer than 30 minutes and bitrate measurements across different quality levels.
-- **Items lacking standalone archived live reports (尚未确认 / unconfirmed attribution)**: independent photo zebra, unified setup menu, cold-boot config auto-restore (`A:\ZFCEXT.CFG`), and per-build live observations on `extmenu1b` / `extsnd1` / `extboot1` (summarized in `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`; `EXTBOOT1-REPORT.md` is a pre-flash offline report with `camera_verified: false`).
+- **Follow-up owner report**: The owner confirmed separate on-camera tests of the unified Setup menu, independent photo zebra, and cold-boot configuration restoration on `zfc_all1b`. The owner also confirmed testing custom shutter sound on the earlier `extsnd1` and `extboot1` builds. Per-build raw logs for those earlier tests have not been archived.
 - **Historical video measurements**: `zfc-patchkit@10d619b:CHANGELOG.md` records the `slowmo25` 10-minute clip. The historical summary at `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` reports a `34:32` / `3.1 GB` recording and 5 MP4 quality modes. The image used for each of those two results has not been confirmed. Full 125 min, 4 GiB boundary, long 4K recording, full 25 min slow-motion, and MOV remain untested.
 
 ## Quick start

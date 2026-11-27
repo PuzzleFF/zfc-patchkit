@@ -33,6 +33,12 @@
   "label": "zfc-v1",
   "spec": "patches/combo.json",
   "sha256": "2c9cc3a91d49f8c1430b3d3f172c79aa197cf84a9b583682dfc4818d731ec161",
-  "note": "正式版：慢动作 25 分钟 + bitrate-b + 斑马纹"
+  "note": "v1 正式版：慢动作 25 分钟 + bitrate-b + 斑马纹"
+ },
+ {
+  "label": "zfc-v2",
+  "spec": "patches/zfc-v2.json",
+  "sha256": "b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8",
+  "note": "v2.0 全功能正式版：125 分钟视频 + 慢动作 25 分钟 + 4K/1080p 品质码率菜单 + 统一设定扩展菜单 + 独立拍照斑马纹 + 静音自定义快门声 + 自定义画幅双屏遮罩/EVF 加速/回放缩放修复/视频档自动隐藏 + 单文件 A:\\ZFCEXT.CFG 开机自恢复"
  }
 ]

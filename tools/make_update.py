@@ -53,14 +53,13 @@ def verify(path: pathlib.Path, stock: bytes | None = None) -> dict:
         "crc_residue": binascii.crc_hqx(data, 0),
         "sha256": sha256(data),
         "version": data[0x20:0x30].split(b"\0")[0].decode("ascii", "replace"),
-        "size_ok": len(data) == MODULE_SIZE,
+        "size_ok": len(data) >= MODULE_SIZE and (len(data) % 2 == 0),
+        "appended_bytes": max(0, len(data) - MODULE_SIZE),
         "crc_ok": binascii.crc_hqx(data, 0) == 0,
     }
     if stock is not None:
-        if len(stock) != len(data):
-            info["changed_bytes"] = None
-        else:
-            info["changed_bytes"] = sum(1 for a, b in zip(stock, data) if a != b)
+        common = min(len(stock) - 2, len(data) - 2)
+        info["changed_bytes"] = sum(1 for a, b in zip(stock[:common], data[:common]) if a != b)
     return info
 
 

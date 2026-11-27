@@ -6,13 +6,12 @@
 
 # 简体中文
 
-给 Nikon Z fc（C 1.81，EXPEED 6）做**自制固件功能补丁**的一组工具与已实测补丁。
+给 Nikon Z fc（C 1.81，EXPEED 6）做**自制固件功能扩展与补丁**的工具集与已实机验证规格。
 
-**路线只有一条**：改主模块 `eg` 的字节 → 重算模块 CRC16 → 命名 `EG198581.BIN` →
-放 SD 卡根目录 → 相机自己的「设置 → 固件版本 → 版本升级」。
-**不需要 K8、不需要重新签名整包、不需要服务模式。**
+**路线只有一条**：基于官方固件提取主模块 `eg` → 打补丁/追加代码 → 重算模块 CRC16 → 命名 `EG198581.BIN` → 放 SD 卡根目录 → 相机「设定菜单 → 固件版本 → 版本升级」。
+**不需要 K8、不需要重新签名整包、不需要服务模式、不需要任何第三方 Python 依赖库。**
 
-> 这个仓库**不包含任何尼康固件**。官方升级文件请自行从尼康官网获取，脚本会校验它的 SHA-256。
+> 这个仓库**不包含任何尼康固件**。官方升级文件请自行从尼康官网获取，脚本会严格校验它的 SHA-256。
 
 ## 适用与状态
 
@@ -20,146 +19,86 @@
 |---|---|
 | 机型 | Nikon Z fc |
 | 固件 | C 1.81（容器 `Z_fc_0181.bin`，35,578,974 字节，sha256 `e4cd838a…bd1b6`） |
-| 已验证的安装链路 | ✅ 实机（原厂模块重刷、真实补丁刷入、断电重启后功能正常） |
-| 回滚 | ✅ 刷 `stock` 镜像即回到原厂 |
+| 最新正式版 | **`zfc-v2`（v2.0 全功能版）** — SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`（35,060,342 字节） |
+| 回滚 | ✅ 刷 `stock` 镜像即回到原厂（`cd47efc1…`） |
 
-## 已实测的功能
+## v2.0 已实机验证功能（`zfc-v2` 七合一）
 
-| 功能 | 改动 | 实机结果 |
+| 功能 | 说明 | 实机结果 |
 |---|---|---|
-| **慢动作上限 3 → 25 分钟** | `0x102A0470` 4 字节（`180000` → `1500000` ms） | 已录 10 分钟正常（原厂 3 分钟）；25 分钟满程未验 |
-| **1080p 码率提升** | 模式表 `0x10717144` 的 6 条记录（高档 84/70 与 56/48，标准档 56/48 与 28/24） | 8 个格式实测符合目标；4K 未动 |
-| **照片取景斑马纹** | `0x101765DE` / `0x1017670A` 各 2 字节（`cbz r5,reject` → `nop`） | 照片取景出条纹，**原厂视频菜单「加亮显示」可直接开关** |
+| **125 分钟视频解锁** | 解锁 29:59 录制上限（84 项时长表 + 引擎门限 `0x1029E088`） | ✅ 菜单显示 `125:00`，实录 34:32 / 3.1 GB 通过（4 GiB 与 4K 长录边界未测满） |
+| **慢动作上限 3 → 25 分钟** | `0x102A0470`（`180000` → `1500000` ms） | ✅ 菜单显示 `25:00`，实录 10 分钟正常（25 分钟满程未测） |
+| **4K / 1080p 品质菜单与可调码率** | 解锁视频品质菜单（高 / 标准）+ `qmenu_rates`（4K 高 144/120 Mbps、标准 72/60 Mbps；1080p 高/标准可选） | ✅ MP4 五模式实测通过（MOV 未测） |
+| **统一设定菜单入口 + 独立拍照斑马纹** | 设定菜单底部新增统一扩展入口（冷启动直显文字），拍照斑马纹与视频斑马纹完全独立 | ✅ 实机通过 |
+| **静音模式自定义快门声** | 5 个固定 WAV 槽位（`A:\ZFC\SHUTTER.WAV`、`1.WAV`~`4.WAV`，8 kHz 16-bit 单声道，≤1.08 秒），菜单选中自动试听 | ✅ 实机通过 |
+| **完整自定义画幅套件** | 新增 `2.35:1` / `1.85:1` / `4:3` / `2:1` / `65:24 XPAN`（去 5:4，单页 8 项）；LCD+EVF 双屏纯黑实时取景遮罩（保留 EVF UI、4 像素突发加速切换约 1 秒）；免重启回放 1/2/3 级放大修复；**视频档自动隐藏遮罩、切回拍照档立刻恢复** | ✅ 实机全面通过 |
+| **单文件持久化 + 开机即生效** | 画幅、拍照斑马纹、自定义快门声统一保存于 `A:\ZFCEXT.CFG`，**开机自动恢复，无需进任何菜单** | ✅ 实机通过 |
 
-**正式版 = `zfc-v1`**（三项合一，23 处改动、88 字节写入、实际变化 74 字节）。
+> 保留全部 v1 等长补丁（`stock`、`slowmo25`、`bitrate-a`、`bitrate-b`、`zebra-photo`、`zfc-v1`），随时可按需构建。
 
 ## 快速开始
 
 ```bash
-# 1) 放好官方固件（同名或 --firmware 指定）
-#    Z_fc_0181.bin  sha256 = e4cd838a215c113659416983b31dbdba8896591caacf7309170d4cc3c60bd1b6
+# 1) 放好官方固件 Z_fc_0181.bin（同名或 --firmware 指定）
+#    sha256 = e4cd838a215c113659416983b31dbdba8896591caacf7309170d4cc3c60bd1b6
 
-# 2) 复现全部镜像并逐一对哈希（推荐先做这一步）
-python tools/verify_release.py
+# 2) 一键复现全部镜像（含 stock、v1、zfc-v2）并逐一校验 SHA-256
+python tools/verify_release.py --firmware Z_fc_0181.bin
 
-# 3) 或者自己构建某一版
-python tools/patch.py --input Z_fc_0181.bin --spec patches/combo.json \
+# 3) 或单独构建 v2.0 全功能版
+python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
                       --output out/EG198581.BIN --report out/report.json
 ```
 
-`verify_release.py` 会把 `pins.json` 里每个镜像重建一遍并与实测时的哈希对比 ——
-**如果全部 MATCH，说明你的固件和工具链与当初完全一致。**
-
-## 目录
-
-| 路径 | 内容 |
-|---|---|
-| `patches/*.json` | 补丁规格：`{offset, expected, replacement}` 列表 |
-| `tools/zf.py` | 容器解析 / 模块提取 / CRC16（XOR 表缓存在 `tables.json`） |
-| `tools/patch.py` | 等长补丁器（五道闸门，见下） |
-| `tools/make_update.py` | 生成 SD 卡可用的 `EG198581.BIN` + 刷机说明 + 回滚镜像 |
-| `tools/verify_release.py` | 复现并核对哈希 |
-| `docs/` | 技术报告：模式表结构、斑马纹门、码率实测、注入空间分析、阶段小结 |
-
-## 安全闸门（`patch.py` 强制执行，任一条不过就中止）
-
-1. **R2 等长**：只做等长替换，模块长度永不变
-2. **R3 边界**：目录区与其他模块一字不动
-3. **R7 改动范围**：除声明的字节与模块 CRC 外，任何字节变化都中止
-4. **R8 输入固定**：输入必须是钉死 SHA-256 的官方镜像
-5. **整包 CRC 不变式**：重算模块 CRC 后，整包 CRC 必须仍是 `0xC023`
+自定义快门声使用方法与架构详见 [docs/V2-ARCHITECTURE.md](docs/V2-ARCHITECTURE.md)。
 
 ## 参考与致谢
 
-本项目的**方法**来自 [Wonder Lantern（Nikon Z30 固件扩展项目）](https://github.com/WonderLantern/wonder-lantern-z30)。
-它把"往固件模块里停放新代码 + 把既有调用重定向过去"这条路走通了（项目里叫 `CAPACITY`），
-并在此之上做出了一整套功能：自定义菜单、画幅遮罩、全信息页、快门音、机内码率档位、
-照片取景斑马纹、模块宿主等。本仓库的三个功能里有几个直接受益于它的结论：
+本项目的核心方法（独立 EG 模块安装路径、`CAPACITY` 代码停放、`ldr.w pc` 跳板、SD 卡配置持久化等）深受 [Wonder Lantern（Nikon Z30 固件扩展项目）](https://github.com/WonderLantern/wonder-lantern-z30) 启发。Z fc 与 Z30 同属 EXPEED 6 平台，但函数地址与结构体布局均存在差异，本仓库中 Z fc 的全部地址、表格、门控与实机结果均为独立逆向定位并实测验证。
 
-- **独立 EG 模块的安装路径**（改模块 → 重算 CRC16 → `EG1985??.BIN` → SD 卡 → 相机自身升级）
-- **`ldr.w pc` 跳板**这句写法（把 N 字节窗口换成"远跳 + 字面量"）
-- **把配置存到 SD 卡**而不是写进固件的思路
-
-Z30 与 Z fc 是同一代 EXPEED 6 平台，但**函数级地址不能照搬** —— 同一处代码在两个机型上的
-位移都不是常数（我们实测同一处 `bl` 的目标位移与门本身的位移相差 `0xDC`）。所以本仓库里
-Z fc 的每一个地址、数据表与验证结果都是重新定位、独立实测的。
-
-其他参考：[NikonUnlock](https://github.com/summershrimp/NikonUnlock)（服务模式语言解锁协议）、
-[nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools)（容器解包的 XOR 表）。
+其他参考：[NikonUnlock](https://github.com/summershrimp/NikonUnlock)、[nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools)。
 
 ## 免责声明
 
-改固件有风险。**升级过程中断电可能让相机无法开机**，且本机型没有已知的 USB 救援路径
-（USB 栈就在被替换的 `eg` 模块里）。请满电操作、不要中断。
-本工具与作者不对任何设备损坏、保修失效或数据丢失负责。仅供研究与个人使用。
+改固件有风险。**升级过程中断电可能导致相机无法开机**，且本机型没有已知的 USB 救援路径。请确保电量 ≥ 50%、切勿中断升级。本工具与作者不对任何设备损坏、保修失效或数据丢失负责。仅供研究与个人使用。
 
 ---
 
 # English
 
-Tools and **camera-verified** feature patches for the Nikon Z fc (firmware C 1.81, EXPEED 6).
+Pure-Python (zero external dependencies) tools and **camera-verified** firmware patches for the Nikon Z fc (firmware C 1.81, EXPEED 6).
 
-One installation route only: patch bytes in the `eg` module → recompute its CRC16 →
-name it `EG198581.BIN` → put it in the SD card root → use the camera's own
-*Setup → Firmware version → Update*. No K8, no re-signing of the full package, no service mode.
+One installation route only: patch the `eg` module from your own official `Z_fc_0181.bin` → recompute its CRC16 → copy `EG198581.BIN` to the SD card root → *Setup → Firmware version → Update*. No K8, no full-package re-signing, no service mode.
 
-> This repository ships **no Nikon firmware**. Obtain the official update yourself;
-> the scripts verify its SHA-256 before doing anything.
+> This repository ships **no Nikon firmware**. Obtain the official update yourself; the scripts verify its SHA-256 before doing anything.
 
-## Verified features
+## v2.0 Camera-Verified Features (`zfc-v2`)
 
-| Feature | Patch | Camera result |
-|---|---|---|
-| Slow-motion limit 3 → 25 min | 4 bytes at `0x102A0470` | 10-minute clip recorded fine; full 25 min untested |
-| 1080p bitrate boost | 6 records in the mode table at `0x10717144` | 8 formats measured on target; 4K untouched |
-| Photo-mode zebra | 2 bytes at `0x101765DE` / `0x1017670A` | Stripes in photo live view, toggled by the native *Highlight display* menu item |
+- **125-minute video unlock** (`unlock2`: verified to 34:32 / 3.1 GB; 4 GiB & 4K long-recording bounds untested)
+- **Slow-motion 3 → 25 min** (`slowmo25`: verified to 10 min; full 25 min untested)
+- **Movie Quality menu + 4K / 1080p adjustable bitrate** (`qs8`: 4K Normal 72/60 Mbps vs High 144/120 Mbps, 1080p Normal/High; verified in MP4)
+- **Unified Setup Menu entry + Independent Photo Zebra** (cold-boot text rendering; Movie zebra stays 100% stock)
+- **Silent-mode Custom Shutter Sound** (5 WAV slots in `A:\ZFC\SHUTTER.WAV`, `1.WAV..4.WAV`, auto-preview on select)
+- **Complete Custom Aspect Ratio suite** (`2.35:1`, `1.85:1`, `4:3`, `2:1`, `65:24 XPAN`; `5:4` removed, 8 items on Page 1; pure-black LCD + EVF masks with EVF UI preserved & 4-pixel burst speedup; no-reboot playback zoom fix; automatic hide in Movie mode)
+- **Single unified config (`A:\ZFCEXT.CFG`) + Cold-boot Auto-Restore** (works immediately on power-on without opening any menu)
 
-`zfc-v1` combines all three (23 edits, 88 bytes written, 74 bytes actually changed).
+All v1 equal-length specs (`stock`, `slowmo25`, `bitrate-a`, `bitrate-b`, `zebra-photo`, `zfc-v1`) remain supported.
 
 ## Quick start
 
 ```bash
-python tools/verify_release.py        # rebuild everything and check the pinned hashes
-python tools/patch.py --input Z_fc_0181.bin --spec patches/combo.json \
+python tools/verify_release.py --firmware Z_fc_0181.bin
+python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
                       --output out/EG198581.BIN --report out/report.json
 ```
 
-## Safety gates
+See [docs/V2-ARCHITECTURE.md](docs/V2-ARCHITECTURE.md) for SD card WAV format, architecture details, and honest verification boundaries.
 
-Equal-length replacement only; module boundary and directory untouched; nothing but the
-declared bytes and the module CRC may change; input pinned by SHA-256; the container CRC
-invariant (`0xC023`) must still hold.
+## Credits & Disclaimer
 
-## Prior art and credits
+Method inspired by [Wonder Lantern (Nikon Z30)](https://github.com/WonderLantern/wonder-lantern-z30); also referencing [NikonUnlock](https://github.com/summershrimp/NikonUnlock) and [nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools). Every Z fc address, table, and verification result here was located and verified independently.
 
-The *method* comes from [Wonder Lantern](https://github.com/WonderLantern/wonder-lantern-z30),
-a Nikon Z30 firmware-extension project. It established the technique of parking new code in
-the firmware module and redirecting existing calls into it (called `CAPACITY` there), and
-built a whole feature set on top: custom menus, aspect masks, a full-info display, shutter
-sounds, in-camera bitrate profiles, photo-mode zebra and a module host. Several pieces here
-follow directly from its findings:
-
-- the **standalone EG-module install path** (patch the module → recompute CRC16 →
-  `EG1985??.BIN` → SD card → the camera's own updater)
-- the **`ldr.w pc` trampoline** that turns an N-byte window into a far jump plus a literal
-- the idea of **keeping configuration on the SD card** instead of inside the firmware
-
-The Z30 and the Z fc share the EXPEED 6 generation, but **function-level addresses cannot be
-transplanted**: the same code site shifts by a different amount in each model (we measured a
-`bl` target offset differing from the gate offset by `0xDC`). Every Z fc address, table and
-verification result in this repository was re-located and measured independently.
-
-Also referenced: [NikonUnlock](https://github.com/summershrimp/NikonUnlock) for the
-service-mode language-unlock protocol, and
-[nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools) for the
-container XOR tables.
-
-## Disclaimer
-
-Firmware modification is risky. A power loss during the update can leave the camera
-unbootable, and this model has no known USB recovery path (the USB stack lives in the very
-module being replaced). Use a full battery, do not interrupt. The author is not responsible
-for damaged hardware, voided warranty or lost data. Research and personal use only.
+Firmware modification carries brick risk and Z fc has no known USB recovery path. Use >= 50% battery and do not interrupt updates. Research and personal use only.
 
 ## License
 

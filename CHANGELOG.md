@@ -1,41 +1,20 @@
 # Changelog
 
-## [2.0] - 2026-11-27
+## [2.0] - candidate (unreleased)
 
-Major release (`zfc-v2`, hardware-verified on a physical Nikon Z fc running C 1.81,
-SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`).
-Introduces appended code-cave (`CAPACITY`-style) extensions while keeping all v1
-equal-length specs and pure-Python stdlib tooling intact.
+**Status**: Project candidate on public review branch (`release/v2.0`, recipe commit `a199576`). Formal Release status is governed by GitHub Releases (currently `v1`).
 
-### Added
-- **125-minute video recording unlock** (`unlock2`) — 84 duration-table entries
-  (`0x116DB8A4..0x116DBA60`, `1,799,000` -> `7,500,000` ms) + 1 engine-gate literal
-  (`0x1029E088`). Verified on hardware to 34:32 / 3.1 GB (menu displays `125:00`;
-  4 GiB boundary & 4K long-recording segment math remain untested).
-- **Movie Quality menu unlock + 4K / 1080p adjustable bitrate (`qs8`)** — unlocks
-  Movie Quality page 205 + condition `0x49` and hooks `0x103544C4` (`qmenu_rates`):
-  4K Normal `72/60 Mbps` vs 4K High `144/120 Mbps`, 1080p Normal vs High selectable
-  in-camera (verified on 5 MP4 modes; MOV untested).
-- **Unified Setup Menu entry + Independent Photo Zebra** — appends a single custom
-  entry to Setup Menu Page 394 (`36 -> 37` rows) with cold-boot text rendering
-  (`style_tbl[2]` lazy initialization) and an independent Photo-mode highlight display
-  toggle that leaves Movie-mode zebra 100% stock.
-- **Silent-mode Custom Shutter Sound** — 5 fixed WAV slots in `A:\ZFC\`
-  (`SHUTTER.WAV`, `1.WAV`..`4.WAV`, max 17,280 B / ~1.08 s @ 8 kHz 16-bit mono) with
-  automatic preview playback on menu selection.
-- **Complete Custom Aspect Ratio suite + EVF Burst Speedup + Movie Auto-Hide** —
-  adds `2.35:1`, `1.85:1`, `4:3`, `2:1`, and `65:24 XPAN` (removes `5:4`, all 8 items
-  on Page 1), pure-black Live View masks on both LCD (`0xD0959600`) and EVF
-  (`0xD045F200`) with EVF UI intact, 4-pixel `ldmia`/`stmia` EVF burst speedup (~1 s
-  LCD/EVF switch), no-reboot playback zoom fix (Site A + Site B), and automatic mask
-  hide when switching to Movie mode.
-- **Single unified config file (`A:\ZFCEXT.CFG`) + Cold-boot Auto-Restore** — stores
-  Aspect Ratio, Photo Zebra, and Custom Shutter Sound in one 32 B CRC32-protected file
-  and restores all settings automatically on power-on without opening any menu.
-- `tools/patch.py` extended to support both v1 equal-length specs and v2 code-cave
-  specs (`append_hex` + `append_sha256` verification) with zero external dependencies.
-- `docs/V2-ARCHITECTURE.md` documenting the v2.0 architecture, SD card layout, and
-  verified boundaries.
+### Summary of Candidate Changes (`zfc-v2` / research label `zfc_all1b`)
+- **Video settings**: 125-minute recording duration entries + engine gate (`unlock2`), 25-minute slow-motion setting (`slowmo25`), and Movie Quality menu + `qmenu_rates` (`qs8`).
+- **Setup menu, zebra & shutter sound**: Unified Setup Menu Page 394 entry with cold-boot text initialization, independent Photo-mode highlight display toggle, and 5-slot silent-mode custom shutter sound (`ZFC\SHUTTER.WAV`, `1.WAV`..`4.WAV`; 8 kHz 16-bit mono PCM WAV <= 17,280 B).
+- **Custom aspect ratio suite**: 5 custom ratios (5:4 removed, 8 items on Page 1), LCD + EVF pure-black Live View masks with EVF UI preservation and 4-pixel `ldmia`/`stmia` burst speedup, no-reboot playback zoom repair, and automatic mask hide in Movie mode.
+- **Unified configuration & boot auto-restore**: Single `A:\ZFCEXT.CFG` file restored automatically on cold boot.
+- **Tooling**: `tools/patch.py` extended to support `expected_sha256` target checks and `append_recipe` (`copy_stock` + `write`) builds without external dependencies.
+
+### Test & Verification Boundaries
+- **Owner initial test (`zfc_all1b`, photo-focused)**: power cycling, still photography, aspect-ratio masks, custom shutter sound, and short video clips reported no issues. Recordings > 30 minutes and bitrate across quality modes were **not** tested on `zfc_all1b`.
+- **Earlier video measurements (prior builds)**: `34:32` / `3.1 GB` (`unlock2` / `VIDEO1`), `10`-minute slow-motion (`slowmo25`), and 5 MP4 quality modes (`qs8`). Full 125 min, 4 GiB boundary, long 4K recording, full 25 min slow-motion, and MOV remain untested.
+- **Verification**: Declared target SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`; previously reviewed offline report recorded 0 violations and 27 two-byte zero-padding warnings; independent verification of current commit `a199576` is pending. See [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md) and [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md).
 
 ## [1] - 2026-10-25
 
@@ -61,4 +40,4 @@ running firmware C 1.81, plus the tooling used to produce and reproduce them.
 
 ### Notes
 - 4K bitrate deliberately left at the stock 144/120 and 72/60.
-- The 30-minute recording limit was solved in v2.0 (`unlock2` engine gate at `0x1029E088`).
+- The 30-minute recording limit was later addressed in the v2.0 candidate (`unlock2`).

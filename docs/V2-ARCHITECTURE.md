@@ -6,7 +6,7 @@
 
 ## 1. 功能范围与验证边界对照
 
-| 领域 | 候选版行为 | 实测归因与审查边界 |
+| 领域 | v2.0 行为 | 实测归因与审查边界 |
 |---|---|---|
 | **普通录像（125 分钟）** | 菜单上限 `125:00`（`unlock2`） | 机主在 `zfc_all1b` 上仅测短录像（未报告异常），**未测超过 30 分钟录像**。历史汇总报告记录了普通录像 `34:32` / `3.1 GB`，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 与 `CFW@b6d4d04:research/nikon_zfc/snapshots/zfc-v2-20261127/README.md`，公开仓未附单组件原始日志）；125 分钟满程、4 GiB 边界与 4K 长录均未验证 |
 | **慢动作（25 分钟）** | 菜单上限 `25:00`（`slowmo25`） | 更早的 `10` 分钟记录来自 `slowmo25`（固定出处：`zfc-patchkit@10d619b:CHANGELOG.md`、`docs/MILESTONE-2026-10-25.md`）；25 分钟满程未验证 |

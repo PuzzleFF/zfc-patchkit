@@ -1,46 +1,45 @@
-# zfc-patchkit v2.0 Architecture & Usage Guide
+# Nikon Z fc v2.0 候选版：功能范围、SD 卡格式与证据边界
 
-`zfc-v2` (`patches/zfc-v2.json`, output SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`,
-`35,060,342` bytes, CRC16 residue `0x0000`) extends the Nikon Z fc C 1.81 `eg` module
-using appended Thumb-2 code-cave blocks (`+38,652` B) and 135 guarded native hook/table
-windows.
+- **候选版标识**：公开名 `zfc-v2`（研究代号 `zfc_all1b`），面向 Nikon Z fc C 1.81。
+- **状态**：**v2.0 候选版（candidate）**；正式 Release 状态以 GitHub Releases 为准（当前正式版为 `v1`）。
+- **配方提交**：`release/v2.0` @ `a1995765343359c69b6bf327068f660343e51851`（声明目标大小 `35,060,342` B，目标 SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`）。
 
-## SD Card Layout
+## 1. 功能范围与验证边界对照
 
-All user configuration and custom audio assets live on the SD card (`A:\`):
-
-| Path on SD Card | Purpose | Format |
+| 领域 | 候选版行为 | 实测归因与审查边界 |
 |---|---|---|
-| `A:\ZFCEXT.CFG` | Unified settings file (Aspect Ratio + Photo Zebra + Shutter Sound) | Auto-created by camera (32 B `'ZFE1'` v1 + CRC32) |
-| `A:\ZFC\SHUTTER.WAV` | Custom shutter sound — Slot 1 | Uncompressed PCM WAV, 8 kHz 16-bit mono, <= 17,280 B (~1.08 s) |
-| `A:\ZFC\1.WAV` .. `4.WAV` | Custom shutter sound — Slots 2..5 | Same PCM WAV format |
+| **普通录像（125 分钟）** | 菜单上限 `125:00`（`unlock2`） | 机主在 `zfc_all1b` 上仅测短录像（未报告异常），**未测超过 30 分钟录像**。历史汇总报告记录了普通录像 `34:32` / `3.1 GB`，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 与 `CFW@b6d4d04:research/nikon_zfc/snapshots/zfc-v2-20261127/README.md`，公开仓未附单组件原始日志）；125 分钟满程、4 GiB 边界与 4K 长录均未验证 |
+| **慢动作（25 分钟）** | 菜单上限 `25:00`（`slowmo25`） | 更早的 `10` 分钟记录来自 `slowmo25`（固定出处：`zfc-patchkit@10d619b:CHANGELOG.md`、`docs/MILESTONE-2026-10-25.md`）；25 分钟满程未验证 |
+| **视频品质与码率（`qs8`）** | 解锁品质菜单（高 / 标准）+ `qmenu_rates` | **`zfc_all1b` 未测不同画质档位的码率**。历史汇总报告记录了 5 种 MP4 模式，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`，公开仓未附单组件原始日志）；MOV 未测；全局解锁可能暴露原厂隐藏项 |
+| **自定义画幅与遮罩** | 5 档新增画幅（去 5:4，单页 8 项）、LCD/EVF 纯黑遮罩（EVF UI 保留 + 4 像素突发加速）、免重启回放放大、视频档自动隐藏遮罩 | 机主在 `zfc_all1b` 上实测拍照、画幅遮罩及**切到视频档自动隐藏 / 切回拍照档恢复**未报告异常 |
+| **静音模式自定义快门声** | 5 槽固定 WAV，选中自动试听 | 机主在 `zfc_all1b` 上实测自定义快门声未报告异常，也补充确认早期 `extsnd1` / `extboot1` 的快门声已实机测试。早期版本的逐项原始日志尚未归档 |
+| **扩展菜单与独立拍照斑马纹** | 设定菜单底部统一入口（冷启动直显文字）+ 独立拍照斑马纹 | 机主补充确认在 `zfc_all1b` 上实机测试了统一设定菜单入口和独立拍照斑马纹。早期构建的逐项结果应以各自记录为准 |
+| **统一配置与开机自恢复** | 单文件 `A:\ZFCEXT.CFG`，冷启动自动恢复 | 机主补充确认在 `zfc_all1b` 上单独实机测试了开机配置自恢复。`zfc-research@e77cb5c:notes/EXTBOOT1-REPORT.md` 是早期构建的刷前离线报告 |
 
-> Tip: Converting any shutter clip with `ffmpeg`:
-> ```bash
-> ffmpeg -i input.wav -ar 8000 -ac 1 -sample_fmt s16 -t 1.05 SHUTTER.WAV
-> ```
+## 2. SD 卡目录与自定义快门声 WAV 要求
 
-## Key Technical Subsystems
+| SD 卡路径 | 用途 | 格式要求 |
+|---|---|---|
+| `A:\ZFCEXT.CFG` | 统一配置文件（画幅 + 拍照斑马纹 + 快门声） | 相机自动生成（32 B `'ZFE1'` v1 + CRC32） |
+| `A:\ZFC\SHUTTER.WAV` | 自定义快门声 — 槽位 1 | 未压缩 PCM WAV（`pcm_s16le`），**8,000 Hz、16-bit、单声道**，PCM 数据 **≤ 17,280 B（~1.08 秒）** |
+| `A:\ZFC\1.WAV` .. `4.WAV` | 自定义快门声 — 槽位 2~5 | 同上（建议 ≤ 1.0 秒） |
 
-1. **Video Suite (`unlock2` + `slowmo25` + `qs8`)**
-   - Unlocks the 30-minute recording cap (`0x1029E088` engine gate + 84 duration table entries at `0x116DB8A4..0x116DBA60` -> `7,500,000` ms / 125 min).
-   - Raises slow-motion cap (`0x102A0470`) from 3 min to 25 min.
-   - Enables the hidden Movie Quality menu (Page 205 + condition `0x49`) and redirects `0x103544C4` to `qmenu_rates` so 4K and 1080p MP4 offer selectable **Normal** (4K 72/60 Mbps) and **High** (4K 144/120 Mbps) bitrates.
-2. **Unified Setup Menu & Independent Photo Zebra**
-   - Appends one entry at the bottom of Setup Menu Page 394 (`36 -> 37` rows) leading to a unified hub (`Pages 964 / 962 / 961 / 963`) with cold-boot text style lazy initialization (`style_tbl[2] = 0x02642413`).
-   - Dual zebra hooks (`0x101765DA`, `0x10176706`) gate Photo mode (`r5 == 0`) on the custom toggle while keeping Movie-mode zebra 100% stock.
-3. **Silent-Mode Custom Shutter Sound**
-   - Hooks the silent-shutter audio dispatch path (`0x100725C4` with Thumb-aligned `A_ARG = 0x04190004`, `0x1006BE18`, `0x1006BE54`), pre-loads the selected WAV slot, and auto-previews when switching slots in the menu.
-4. **Custom Aspect Ratio Suite + EVF Burst Speedup + Movie Auto-Hide**
-   - Adds `2.35:1`, `1.85:1`, `4:3`, `2:1`, and `65:24 XPAN` (removes `5:4`; all 8 items fit on Page 1).
-   - Repairs JPEG/EXIF metadata and no-reboot playback zoom (Site A `0x1033FF50` + Site B `0x102B0850`).
-   - Draws pure-black Live View masks on both LCD (`0xD0959600`) and EVF (`0xD045F200`, preserving all non-zero-alpha EVF UI pixels) using 4-pixel `ldmia`/`stmia` bursts + 32:1 steady-state EVF throttle (~1 s switch).
-   - Automatically retires the Photo mask when switching to Movie mode (`EXT_IS_MOVIE` published by `0x101765DA`/`0x10176706`) and restores it immediately on return to Photo mode.
-5. **Cold-Boot Auto-Restore**
-   - One-shot `ext_boot_restore` runs on the GUI task (`0x104B4E0A`) with a re-entry guard and 4-retry SD mount cap so Aspect Ratio, Photo Zebra, and Custom Shutter Sound all work immediately on power-on without opening any menu.
+转换示例：
+```bash
+ffmpeg -i input.wav -ar 8000 -ac 1 -c:a pcm_s16le -t 1.0 SHUTTER.WAV
+```
 
-## Known Unverified Bounds (Honest Disclosures)
-- `125 min` recording was hardware-verified to `34:32` / `3.1 GB`; the `4 GiB` boundary (~47:34) and 4K long-recording segment math have not been run to completion.
-- Slow-motion `25 min` was hardware-verified to `10 min` (full 25 min run untested).
-- Movie Quality (`qs8`) was verified in MP4 (MOV untested); unlocking Page 205 globally may expose stock-hidden options in some modes.
-- No hardware/USB brick recovery path exists on Z fc; always flash with battery >= 50% and keep the stock rollback image (`build/verify/stock/EG198581.BIN`) handy.
+## 3. 验证记录与提交绑定
+
+| 证据类别 | 对应提交 / 来源 | 状态 |
+|---|---|---|
+| 既有离线构建与门禁报告（`zfc_all1b`） | 私有 `zfc-research@e77cb5c`（`notes/ZFC-ALL1B-REPORT.md`）与本地 `zfc_all1b-finalbin-gate.json` | 已归档（记录 0 项违规、27 项警告——经复核全部 27 项均为 2 B 零填充提示，仅针对该旧报告） |
+| 当前公开配方声明的目标哈希与作者本地复现 | `release/v2.0` @ `a199576`（`patches/zfc-v2.json`） | **作者本地报告**：[V2-LOCAL-VERIFY-a199576.md](V2-LOCAL-VERIFY-a199576.md)（7/7 匹配 `b5c6e75e…61f8`） |
+| 当前提交 `a199576` 的独立复核与门禁验证 | `release/v2.0` @ `a199576` | **待验证** |
+
+## 4. 回退观察与救援限制
+
+- **已有观察**：在相机正常启动、电量 ≥ 50%、且能正常进入「设定菜单 → 固件版本 → 版本升级」的条件下，先前测试观察到可通过 SD 卡重刷原厂 `EG198581.BIN` 回退。
+- **救援缺口**：上述观察不构成回退保证。若相机无法启动或无法进入升级菜单，目前缺少可靠的 USB 或硬件救援证据。
+
+更多发布审查项与内嵌字节来源见 [RELEASE-CHECKLIST.md](../RELEASE-CHECKLIST.md) 与 [V2-PROVENANCE.md](V2-PROVENANCE.md)。

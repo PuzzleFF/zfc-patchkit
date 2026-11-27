@@ -6,38 +6,46 @@
 
 # 简体中文
 
-**v2.0 目前是 Nikon Z fc（C 1.81，EXPEED 6）的候选版本（candidate），用于公开审查。GitHub 上的正式 Release 仍以 Releases 页面为准（当前为 v1）。**
+**`v2.0`（`zfc-v2` / 研究代号 `zfc_all1b`）是 Nikon Z fc（C 1.81，EXPEED 6）的正式发布版本。**
 
-路线：基于用户自行提供的官方 `Z_fc_0181.bin` 提取主模块 `eg` → 应用补丁与扩展配方 → 重算模块 CRC16 → 命名 `EG198581.BIN` → 放 SD 卡根目录 → 相机「设定菜单 → 固件版本 → 版本升级」。
+路线：基于用户自行提供的官方 `Z_fc_0181.bin` 提取主模块 `eg` → 应用补丁与扩展配方 → 重算模块 CRC16 → 命名 `EG198581.BIN` → 放 SD 卡根目录 → 相机「设定菜单 → 固件版本 → 版本升级」。**纯 Python 标准库，零第三方依赖。**
 
 > 本仓库**不包含任何完整的尼康固件镜像**。官方升级文件请自行从尼康官网获取，脚本会严格校验其 SHA-256。  
-> **关于 `patches/zfc-v2.json` 的内嵌范围限定**：在提交 `a199576` 中，48 处目标窗口校验已改为 `expected_sha256`（不再内嵌原厂 `expected` 字节），且扩展区中 239 段（9,433 B，≥12 B 连续段）原厂菜单/画幅表及原指令数据已改为构建时通过 `copy_stock` 从用户本地固件读取；但**剩余 213 条直接写入记录（`write`）与 48 条替换记录（`replacement`）的来源尚未全部完成核验**（原厂派生表与短原指令重放中仍可能残留 `<12 B` 原厂片段），详见 [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md)。本仓库 MIT 许可仅覆盖项目原创代码与文档，不授予任何 Nikon 固件、资源或商标权利。
+> **关于 `patches/zfc-v2.json` 的内嵌范围说明**：48 处目标窗口校验全部使用 `expected_sha256`（不含原厂 `expected` 字节），扩展区中 239 段 ≥12 B 原厂菜单/画幅表及原指令段（9,433 B）在构建时通过 `copy_stock` 从用户本地固件读取；剩余 213 条直接写入记录（`write`）与 48 条替换记录（`replacement`）的来源台账与维护者确认记录见 [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md)。本仓库 MIT 许可仅覆盖项目原创代码与文档，不授予任何 Nikon 固件、资源或商标权利。
 
-## 适用与版本状态
+## v2.0 更新内容
+
+相比 `v1`（仅含慢动作 25 分钟、1080p 码率提升与复用视频开关的拍照斑马纹），**`v2.0`（`zfc-v2`）是一次完整大版本升级**：
+
+1. **完整自定义画幅套件 + EVF 加速 + 视频档自动隐藏**：新增 `2.35:1`、`1.85:1`、`4:3`、`2:1`、`65:24 XPAN`（移除 `5:4`，全部 8 项单页显示）；LCD + EVF 双屏纯黑实时取景遮罩（保留 EVF UI，4 像素 `ldmia`/`stmia` 突发加速切换约 1 秒）；免重启回放 1/2/3 级放大修复；**切到视频档自动隐藏遮罩，切回拍照档立刻恢复**。
+2. **设定菜单底部统一扩展入口 + 独立拍照斑马纹**：冷启动直显文字，拍照模式高亮显示（斑马纹）与视频模式斑马纹完全独立。
+3. **静音模式自定义快门声**：支持 5 个固定 WAV 槽位（`ZFC\SHUTTER.WAV`、`1.WAV`~`4.WAV`），菜单选中即自动试听。
+4. **全项目单一配置文件 + 开机自动恢复**：画幅、拍照斑马纹、自定义快门声统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复，无需先进菜单。
+5. **视频功能整合**：125 分钟视频录制时长解锁（`unlock2`，不含慢动作）、慢动作 3 → 25 分钟（`slowmo25`）、视频品质菜单解锁 + 4K / 1080p 可调码率（`qs8`）。
+6. **纯 Python 配方补丁器**：`tools/patch.py` 新增 `expected_sha256` 校验与 `append_recipe`（`copy_stock` + `write`），继续完整兼容全部 `v1` 等长补丁。
+
+## 适用与版本标识
 
 | 项 | 值 |
 |---|---|
 | 机型 / 固件 | Nikon Z fc · C 1.81（官方容器 `Z_fc_0181.bin`，35,578,974 B，SHA-256 `e4cd838a…bd1b6`） |
-| 正式 Release（GitHub） | `v1`（`zfc-v1`）— 正式发布状态以 GitHub Releases 页面为准 |
-| 当前分支候选版 | **`v2.0 候选版`（`zfc-v2` / 研究代号 `zfc_all1b`）**，声明目标大小为 `35,060,342` B、目标 SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8` |
+| 当前正式版 | **`v2.0`（`zfc-v2` / `zfc_all1b`）**，目标大小 `35,060,342` B，SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8` |
+| 上一版本 | `v1`（`zfc-v1`，SHA-256 `2c9cc3a9…ec161`），仓库继续保留全部 v1 规格 |
 
-## v2.0 候选版功能范围与实测边界
+## 实测范围与未测边界
 
-### 1. 机主在 `zfc_all1b` 上的初测范围
-- 机主确认已刷入并实测 **`zfc_all1b`**（以拍照为主）：**开关机（仅覆盖开关机本身）、拍照、自定义画幅遮罩（含切到视频档自动隐藏、切回拍照档恢复）、自定义快门声、以及短时间录像均未报告异常**。
-- **在 `zfc_all1b` 上未测试的项目**：**超过 30 分钟的录像**、**不同画质档位的码率实测**。
+- **机主在 `zfc_all1b` 上已实机确认**：开关机、拍照、自定义画幅遮罩（含切到视频档自动隐藏 / 切回拍照档恢复）、统一设定菜单入口、独立拍照斑马纹、自定义快门声、开机配置自恢复、以及短时间录像均未报告异常；机主亦补充确认早期 `extsnd1` / `extboot1` 的自定义快门声已实机测试。
+- **在 `zfc_all1b` 上未测试的项目**：**超过 30 分钟的长录像**、**不同视频画质档位的码率实测**。
 
-### 2. 各模块功能与历史实测归因对照
-
-| 功能 | 候选版声明行为 | 实测归因与历史报告位置 |
+| 功能 | v2.0 行为 | 实测归因与未测边界 |
 |---|---|---|
-| **125 分钟视频解锁** | 菜单时长上限设为 `125:00`（84 项时长表 + 引擎门限 `0x1029E088`） | `zfc_all1b` 仅测短录像，**未测超过 30 分钟录像**。历史汇总报告记录了普通录像 `34:32` / `3.1 GB`，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 与 `CFW@b6d4d04:research/nikon_zfc/snapshots/zfc-v2-20261127/README.md`，公开仓未附单组件原始日志）；`125` 分钟满程、`4 GiB` 边界与 `4K` 长录均未验证 |
-| **慢动作上限 3 → 25 分钟** | 菜单时长上限设为 `25:00`（`0x102A0470`） | 更早的 `10` 分钟录像记录来自 `slowmo25`（固定出处：`zfc-patchkit@10d619b:CHANGELOG.md`、`docs/MILESTONE-2026-10-25.md`）；`25` 分钟满程未验证 |
-| **4K / 1080p 品质与码率菜单** | 解锁视频品质菜单（高 / 标准）+ `qmenu_rates` | **`zfc_all1b` 未测不同画质档位的码率**。历史汇总报告记录了 5 种 MP4 模式，所测镜像尚未确认（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`，公开仓未附单组件原始日志）；MOV 未测 |
+| **125 分钟视频解锁** | 菜单时长上限设为 `125:00`（84 项时长表 + 引擎门限 `0x1029E088`） | `zfc_all1b` 仅测短录像，**未测超过 30 分钟录像**。历史汇总报告记录了普通录像 `34:32` / `3.1 GB`，所测镜像尚未确认（见 `zfc-research@e77cb5c` 与 `CFW@b6d4d04`）；`125` 分钟满程、`4 GiB` 边界与 `4K` 长录均未验证 |
+| **慢动作上限 3 → 25 分钟** | 菜单时长上限设为 `25:00`（`0x102A0470`） | 更早的 `10` 分钟录像记录来自 `slowmo25`（`zfc-patchkit@10d619b:CHANGELOG.md`、`docs/MILESTONE-2026-10-25.md`）；`25` 分钟满程未验证 |
+| **4K / 1080p 品质与码率菜单** | 解锁视频品质菜单（高 / 标准）+ `qmenu_rates` | **`zfc_all1b` 未测不同画质档位的码率**。历史汇总报告记录了 5 种 MP4 模式，所测镜像尚未确认；MOV 未测 |
 | **自定义画幅套件 + EVF 加速 + 视频档自动隐藏** | 新增 5 档画幅（去 5:4，单页 8 项）、LCD/EVF 纯黑遮罩（保留 EVF UI、4 像素突发加速）、免重启回放放大、视频档自动隐藏遮罩 | 机主在 `zfc_all1b` 上实测拍照、画幅遮罩及**切到视频档自动隐藏 / 切回拍照档恢复**未报告异常 |
-| **静音模式自定义快门声** | 5 个固定 WAV 槽位（选中自动试听） | 机主在 `zfc_all1b` 上实测自定义快门声未报告异常，也补充确认早期 `extsnd1` / `extboot1` 的快门声已实机测试。早期版本的逐项原始日志尚未归档 |
-| **统一设定菜单入口 + 独立拍照斑马纹** | 设定菜单底部扩展入口（冷启动直显文字）+ 独立拍照斑马纹 | 机主补充确认在 `zfc_all1b` 上实机测试了统一设定菜单入口和独立拍照斑马纹。早期构建的逐项结果应以各自记录为准 |
-| **单文件配置与开机自恢复** | 统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复 | 机主补充确认在 `zfc_all1b` 上单独实机测试了开机配置自恢复。`zfc-research@e77cb5c:notes/EXTBOOT1-REPORT.md` 是早期构建的刷前离线报告 |
+| **静音模式自定义快门声** | 5 个固定 WAV 槽位（选中自动试听） | 机主在 `zfc_all1b` 上实测自定义快门声未报告异常，并确认早期 `extsnd1` / `extboot1` 已实机测试（早期逐项原始日志未归档） |
+| **统一设定菜单入口 + 独立拍照斑马纹** | 设定菜单底部扩展入口（冷启动直显文字）+ 独立拍照斑马纹 | 机主确认在 `zfc_all1b` 上实机测试通过 |
+| **单文件配置与开机自恢复** | 统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复 | 机主确认在 `zfc_all1b` 上单独实机测试开机配置自恢复通过 |
 
 ## 快速开始
 
@@ -46,7 +54,7 @@
 # 2) 本地复现全部镜像并核对 pins.json 声明的 SHA-256
 python tools/verify_release.py --firmware Z_fc_0181.bin
 
-# 3) 或单独构建 v2.0 候选版
+# 3) 或单独构建 v2.0 正式版
 python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
                       --output out/EG198581.BIN --report out/report.json
 ```
@@ -66,35 +74,39 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
   ```
 - **使用方式**：在「设定菜单 → 静音拍摄」开启静音模式，并在「设定菜单 → 扩展功能 → 自定义快门声」启用并选择槽位（选中自动试听）。请仅使用你有权使用的音频文件。
 
-## 验证记录与审查状态
+## 验证记录与回退边界
 
-- **已有旧离线报告**：早期研究仓库与本地构建保存了 `zfc_all1b` 的离线检查报告（`gate_zfc_all1b_final` 记录 0 项违规、27 项警告——经复核全部 27 项均为 2 字节零填充提示，仅归属于该旧报告，不代表新的运行时验证）。
-- **当前提交 `a199576`**：作者本地执行 `verify_release.py` 的复现日志已归档于 [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md)（**作者本地报告**，7/7 匹配声明目标 SHA-256 `b5c6e75e…61f8`）；**当前提交尚缺少独立第三方复现与独立审查验证记录（状态：待验证）**。详见 [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md) 与 [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md)。
-
-## 回退观察与救援边界
-
-- **已有回退观察**：在相机**能够正常开机、电池电量充足且能够正常进入「设定菜单 → 固件版本 → 版本升级」**的条件下，先前测试中观察到可以通过 SD 卡重刷原厂 `EG198581.BIN` 回到原厂固件。
-- **重要限制（不构成恢复保证）**：原厂镜像的存在**不能保证一定能够回退成功**。**如果相机无法启动或无法进入升级菜单，目前缺少可靠的 USB 或硬件救援证据**（USB 协议栈本身位于被替换的 `eg` 模块内）。请务必满电（≥ 50%）操作、升级过程中切勿断电或中断。
+- **验证记录**：`a199576` 的作者本地 `verify_release.py` 7/7 复现日志归档于 [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md)（作者本地报告）；既有离线门禁报告记录 0 项违规、27 项 2 字节零填充警告（仅归属该旧报告）。`a199576` 的第三方独立验证暂延后。
+- **回退观察与救援边界**：在相机**能够正常开机、电池电量充足（≥ 50%）且能够正常进入「设定菜单 → 固件版本 → 版本升级」**的条件下，先前测试观察到可通过 SD 卡重刷原厂 `EG198581.BIN` 回退。原厂镜像的存在**不能保证一定能够回退成功**；**如果相机无法启动或无法进入升级菜单，目前缺少可靠的 USB 或硬件救援证据**（USB 协议栈位于被替换的 `eg` 模块内）。升级过程中切勿断电或中断。
 
 ## 参考与致谢
 
-相关研究参考：[Wonder Lantern（Nikon Z30）](https://github.com/WonderLantern/wonder-lantern-z30)、[NikonUnlock](https://github.com/summershrimp/NikonUnlock)、[nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools)。内嵌字节的来源与授权审查状态详见 [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md)。
+本项目在扩展方法、菜单与遮罩思路上参考了 [Wonder Lantern（Nikon Z30）](https://github.com/WonderLantern/wonder-lantern-z30)，同时参考了 [NikonUnlock](https://github.com/summershrimp/NikonUnlock) 与 [nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools)。完整来源台账详见 [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md)。
 
 ---
 
 # English
 
-**v2.0 is currently a project candidate for Nikon Z fc (firmware C 1.81, EXPEED 6) open for review. Formal release status is governed by GitHub Releases (currently v1).**
+**`v2.0` (`zfc-v2` / research build `zfc_all1b`) is the official v2.0 release for Nikon Z fc (firmware C 1.81, EXPEED 6).**
 
-> This repository ships **no complete Nikon firmware image**. Obtain the official `Z_fc_0181.bin` yourself; the scripts verify its SHA-256 before building.  
-> **Scope limit on `patches/zfc-v2.json`**: In commit `a199576`, all 48 target-window checks use `expected_sha256` (no raw stock `expected` bytes), and 239 contiguous runs >= 12 B (9,433 B) of stock menu/profile data are read locally from the user's firmware via `copy_stock`. However, **provenance for all remaining 213 `write` records and 48 `replacement` records is not yet fully closed** (`<12 B` stock fragments may still exist inside stock-derived table gaps). See [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md). The repository's MIT license covers only original project code and documentation and grants no rights to Nikon firmware, resources, or trademarks.
+Pure Python standard library (zero third-party dependencies). Patch `eg` from your own official `Z_fc_0181.bin`, recompute CRC16, copy `EG198581.BIN` to SD card root, and install via *Setup → Firmware version → Update*.
 
-## Owner Initial Test Scope & Attribution Boundaries
+> This repository ships **no complete Nikon firmware image**. Obtain the official `Z_fc_0181.bin` yourself; the scripts verify its SHA-256 before building. In `patches/zfc-v2.json`, all 48 target checks use `expected_sha256` and 239 contiguous runs >= 12 B (9,433 B) of stock data are read locally via `copy_stock`. See [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md) for the full provenance ledger. The MIT license covers only original project code and documentation and grants no rights to Nikon firmware, resources, or trademarks.
 
-- **Owner initial test on `zfc_all1b`** (photo-focused): power cycling (covers power-on/off only), still photography, custom aspect-ratio masks (including Movie-mode auto-hide and Photo-mode restore), custom shutter sound, and short video clips reported no issues.
-- **Untested on `zfc_all1b`**: recordings longer than 30 minutes and bitrate measurements across different quality levels.
-- **Follow-up owner report**: The owner confirmed separate on-camera tests of the unified Setup menu, independent photo zebra, and cold-boot configuration restoration on `zfc_all1b`. The owner also confirmed testing custom shutter sound on the earlier `extsnd1` and `extboot1` builds. Per-build raw logs for those earlier tests have not been archived.
-- **Historical video measurements**: `zfc-patchkit@10d619b:CHANGELOG.md` records the `slowmo25` 10-minute clip. The historical summary at `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` reports a `34:32` / `3.1 GB` recording and 5 MP4 quality modes. The image used for each of those two results has not been confirmed. Full 125 min, 4 GiB boundary, long 4K recording, full 25 min slow-motion, and MOV remain untested.
+## What's New in v2.0 (`zfc-v2`)
+
+1. **Complete Custom Aspect Ratio Suite + EVF Burst Speedup + Movie Auto-Hide**: adds `2.35:1`, `1.85:1`, `4:3`, `2:1`, `65:24 XPAN` (removes `5:4`, all 8 items on Page 1); pure-black LCD + EVF masks (EVF UI preserved, 4-pixel `ldmia`/`stmia` burst speedup ~1 s switch); no-reboot playback zoom fix; **auto-hides in Movie mode and restores in Photo mode**.
+2. **Unified Setup Menu Entry + Independent Photo Zebra**: cold-boot text rendering; Photo-mode highlight display is fully independent of Movie zebra.
+3. **Silent-Mode Custom Shutter Sound**: 5 fixed WAV slots (`ZFC\SHUTTER.WAV`, `1.WAV`..`4.WAV`) with auto-preview on select.
+4. **Unified Config (`A:\ZFCEXT.CFG`) + Cold-Boot Auto-Restore**: stores Aspect Ratio, Photo Zebra, and Shutter Sound in one file and restores automatically on power-on.
+5. **Video Suite**: 125-minute recording unlock (`unlock2`), 3 → 25 min slow-motion (`slowmo25`), and Movie Quality menu + 4K/1080p adjustable bitrate (`qs8`).
+6. **Pure-Python Recipe Patcher**: `tools/patch.py` adds `expected_sha256` and `append_recipe` (`copy_stock` + `write`) while keeping all v1 equal-length specs compatible.
+
+## Test Scope & Boundaries
+
+- **Owner confirmed on `zfc_all1b`**: power cycling, still photography, custom aspect-ratio masks (including Movie-mode auto-hide / Photo-mode restore), unified Setup menu, independent photo zebra, custom shutter sound, cold-boot config auto-restore, and short video clips reported no issues (owner also confirmed custom shutter sound on earlier `extsnd1` / `extboot1`).
+- **Untested on `zfc_all1b`**: recordings > 30 minutes and bitrate measurements across quality modes.
+- **Historical video measurements**: `10`-minute slow-motion documented for `slowmo25` (`zfc-patchkit@10d619b:CHANGELOG.md`); historical summaries report `34:32` / `3.1 GB` and 5 MP4 quality modes (specific test images unconfirmed). Full 125 min, 4 GiB boundary, long 4K, full 25 min slow-motion, and MOV remain untested.
 
 ## Quick start
 
@@ -113,9 +125,9 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
 
 ## Verification & Rollback Boundaries
 
-- **Saved offline reports vs current commit**: The previously reviewed offline gate report for `zfc_all1b` recorded 0 violations and 27 warnings (all 27 classified as 2-byte zero-padding entries in that saved report only). The author's local `verify_release.py` log on `a199576` is archived in [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md) (author local report); **independent verification of commit `a199576` is pending (`待验证`)**.
-- **Rollback observations & limits**: Re-flashing stock `EG198581.BIN` has been observed to work **only when the camera boots normally and can enter the firmware update menu** (battery >= 50%). Having a stock file does **not** guarantee recovery; **there is no reliable recovery evidence if the camera fails to boot or cannot open the update menu**.
+- **Verification**: Author local `verify_release.py` log for `a199576` is archived at [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md) (7/7 MATCH, target `b5c6e75e…61f8`); saved offline gate report recorded 0 violations and 27 two-byte zero-padding warnings. Independent third-party verification is deferred.
+- **Rollback limits**: Re-flashing stock `EG198581.BIN` has been observed to work **only when the camera boots normally and can enter the firmware update menu** (battery >= 50%). Having a stock file does **not** guarantee recovery; **there is no reliable recovery evidence if the camera fails to boot or cannot open the update menu**.
 
 ## Credits & License
 
-References: [Wonder Lantern (Nikon Z30)](https://github.com/WonderLantern/wonder-lantern-z30), [NikonUnlock](https://github.com/summershrimp/NikonUnlock), [nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools). See [LICENSE](LICENSE), [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md), [docs/V2-ARCHITECTURE.md](docs/V2-ARCHITECTURE.md), and [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md).
+Inspired by [Wonder Lantern (Nikon Z30)](https://github.com/WonderLantern/wonder-lantern-z30); also referencing [NikonUnlock](https://github.com/summershrimp/NikonUnlock) and [nikon-firmware-tools](https://github.com/simeonpilgrim/nikon-firmware-tools). See [LICENSE](LICENSE), [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md), [docs/V2-ARCHITECTURE.md](docs/V2-ARCHITECTURE.md), and [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md).

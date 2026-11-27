@@ -1,6 +1,7 @@
-# Nikon Z fc Patchkit v2.0 候选版：剩余内嵌内容来源与授权台账
+# Nikon Z fc Patchkit v2.0：内嵌内容来源与维护者确认台账
 
-- **审查对象**：`PuzzleFF/zfc-patchkit` 分支 `release/v2.0`，提交 `a1995765343359c69b6bf327068f660343e51851`
+- **审查对象**：`PuzzleFF/zfc-patchkit` 配方提交 `a1995765343359c69b6bf327068f660343e51851`（发布于 `v2.0`）
+- **维护者发布确认（2026-11-27）**：维护者已确认 `P1–P9` 与 `W3–W5` 为参考第三方思路（Wonder Lantern Z30 等）后的项目独立重写并在 README 致谢；接受 `a199576` 当前的 `copy_stock` 配方形态（`W1`/`W2`/`W6` 仅余 `<12 B` 结构短间隙，不再拆分）；`tools/tables.json` 沿用自 `v1`。
 - **目标文件**：`patches/zfc-v2.json`（SHA-256 `9c1d5e34d55e89baaf5ac437c4959e750da0d4007db66a33d73517d25c8bf172`）
 - **覆盖范围**：全部 **48 条 `patches[]` 替换记录（索引 `0–47`）**、全部 **213 条 `append_recipe` 直接写入记录（按 `op == "write"` 顺序编号 `0–212`）**，以及随仓分发的第三方表 **`tools/tables.json`**；另含 239 条 `copy_stock` 指令（9,433 B，构建时从用户本地 `Z_fc_0181.bin` 读取，不内嵌字节）。
 - **私有对照提交**：`PuzzleFF/zfc-research` 分支 `research/zfc-v2-complete`（`e77cb5ccbf70942c54b946174023cad62884acd3`）与 `PuzzleFF/CFW` 分支 `research/zfc-v2-findings`（`b6d4d041954d6bc335d96579808f73151bbc2083`）。

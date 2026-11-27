@@ -14,7 +14,7 @@
 ### Test & Verification Boundaries
 - **Owner initial test (`zfc_all1b`, photo-focused)**: power cycling, still photography, aspect-ratio masks, custom shutter sound, and short video clips reported no issues. Recordings > 30 minutes and bitrate across quality modes were **not** tested on `zfc_all1b`.
 - **Earlier video measurements (prior builds)**: `34:32` / `3.1 GB` (`unlock2` / `VIDEO1`), `10`-minute slow-motion (`slowmo25`), and 5 MP4 quality modes (`qs8`). Full 125 min, 4 GiB boundary, long 4K recording, full 25 min slow-motion, and MOV remain untested.
-- **Verification**: Declared target SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`; previously reviewed offline report recorded 0 violations and 27 two-byte zero-padding warnings; independent verification of current commit `a199576` is pending. See [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md) and [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md).
+- **Verification**: Declared target SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`; author local reproduction log archived in [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md) (author local report); previously reviewed offline report recorded 0 violations and 27 two-byte zero-padding warnings; independent verification of current commit `a199576` is pending. See [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md) and [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md).
 
 ## [1] - 2026-10-25
 

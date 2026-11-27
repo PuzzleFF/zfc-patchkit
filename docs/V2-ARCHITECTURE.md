@@ -34,7 +34,7 @@ ffmpeg -i input.wav -ar 8000 -ac 1 -c:a pcm_s16le -t 1.0 SHUTTER.WAV
 | 证据类别 | 对应提交 / 来源 | 状态 |
 |---|---|---|
 | 既有离线构建与门禁报告（`zfc_all1b`） | 私有 `zfc-research@e77cb5c`（`notes/ZFC-ALL1B-REPORT.md`）与本地 `zfc_all1b-finalbin-gate.json` | 已归档（记录 0 项违规、27 项警告——经复核全部 27 项均为 2 B 零填充提示，仅针对该旧报告） |
-| 当前公开配方声明的目标哈希与本地复现 | `release/v2.0` @ `a199576`（`patches/zfc-v2.json`） | 作者本地 `verify_release.py` 复现匹配 `b5c6e75e…61f8` |
+| 当前公开配方声明的目标哈希与作者本地复现 | `release/v2.0` @ `a199576`（`patches/zfc-v2.json`） | **作者本地报告**：[V2-LOCAL-VERIFY-a199576.md](V2-LOCAL-VERIFY-a199576.md)（7/7 匹配 `b5c6e75e…61f8`） |
 | 当前提交 `a199576` 的独立复核与门禁验证 | `release/v2.0` @ `a199576` | **待验证** |
 
 ## 4. 回退观察与救援限制

@@ -69,7 +69,7 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
 ## 验证记录与审查状态
 
 - **已有旧离线报告**：早期研究仓库与本地构建保存了 `zfc_all1b` 的离线检查报告（`gate_zfc_all1b_final` 记录 0 项违规、27 项警告——经复核全部 27 项均为 2 字节零填充提示，仅归属于该旧报告，不代表新的运行时验证）。
-- **当前提交 `a199576`**：在作者本地环境执行 `verify_release.py` 复现出与声明目标一致的 SHA-256（`b5c6e75e…61f8`）；**当前提交尚缺少独立第三方复现与独立审查验证记录（状态：待验证）**。详见 [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md) 与 [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md)。
+- **当前提交 `a199576`**：作者本地执行 `verify_release.py` 的复现日志已归档于 [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md)（**作者本地报告**，7/7 匹配声明目标 SHA-256 `b5c6e75e…61f8`）；**当前提交尚缺少独立第三方复现与独立审查验证记录（状态：待验证）**。详见 [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md) 与 [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md)。
 
 ## 回退观察与救援边界
 
@@ -112,7 +112,7 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
 
 ## Verification & Rollback Boundaries
 
-- **Saved offline reports vs current commit**: The previously reviewed offline gate report for `zfc_all1b` recorded 0 violations and 27 warnings (all 27 classified as 2-byte zero-padding entries in that saved report only). Local `verify_release.py` on `a199576` matched declared target SHA-256 `b5c6e75e…61f8`; **independent verification of commit `a199576` is pending (`待验证`)**.
+- **Saved offline reports vs current commit**: The previously reviewed offline gate report for `zfc_all1b` recorded 0 violations and 27 warnings (all 27 classified as 2-byte zero-padding entries in that saved report only). The author's local `verify_release.py` log on `a199576` is archived in [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md) (author local report); **independent verification of commit `a199576` is pending (`待验证`)**.
 - **Rollback observations & limits**: Re-flashing stock `EG198581.BIN` has been observed to work **only when the camera boots normally and can enter the firmware update menu** (battery >= 50%). Having a stock file does **not** guarantee recovery; **there is no reliable recovery evidence if the camera fails to boot or cannot open the update menu**.
 
 ## Credits & License

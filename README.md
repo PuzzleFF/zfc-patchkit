@@ -24,20 +24,20 @@
 ## v2.0 候选版功能范围与实测边界
 
 ### 1. 机主在 `zfc_all1b` 上的初测范围
-- 机主确认已刷入并实测 **`zfc_all1b`**（主要测试拍照场景）：**开关机、拍照、自定义画幅遮罩（含视频档自动隐藏 / 切回拍照档恢复）、自定义快门声、以及短录像未报告异常**。
-- **在 `zfc_all1b` 上未测试的项目**：**超过 30 分钟的长录像**、**不同视频画质档位的码率实测**。
+- 机主确认已刷入并实测 **`zfc_all1b`**（以拍照为主）：**开关机（仅覆盖开关机本身）、拍照、自定义画幅遮罩（含切到视频档自动隐藏、切回拍照档恢复）、自定义快门声、以及短时间录像均未报告异常**。
+- **在 `zfc_all1b` 上未测试的项目**：**超过 30 分钟的录像**、**不同画质档位的码率实测**。
 
-### 2. 各模块功能与历史实测来源对照
+### 2. 各模块功能与历史实测归因对照
 
-| 功能 | 候选版声明行为 | 历史来源报告与未测边界 |
+| 功能 | 候选版声明行为 | 实测归因与历史报告位置 |
 |---|---|---|
-| **125 分钟视频解锁** | 菜单时长上限设为 `125:00`（84 项时长表 + 引擎门限 `0x1029E088`） | 更早的录像结果来自早期单功能/组件版本（`unlock2` / `VIDEO1` 研究记录）：记录到普通录像 `34:32` / `3.1 GB`。`zfc_all1b` 未测 >30 分钟录像；`125` 分钟满程、`4 GiB` 边界与 `4K` 长录均未验证 |
-| **慢动作上限 3 → 25 分钟** | 菜单时长上限设为 `25:00`（`0x102A0470`） | 更早的录像结果来自 `slowmo25`（v1 / `VIDEO1` 研究记录）：记录到 `10` 分钟正常。`25` 分钟满程未验证 |
-| **4K / 1080p 品质与码率菜单** | 解锁视频品质菜单（高 / 标准）+ `qmenu_rates`（4K 高/标准、1080p 高/标准可选） | 更早的码率结果来自 `qs8` 组件研究记录（覆盖 5 种 MP4 模式）。`zfc_all1b` 未测不同画质码率；MOV 未测 |
-| **统一设定菜单入口 + 独立拍照斑马纹** | 设定菜单底部扩展入口（冷启动直显文字）+ 独立拍照斑马纹 | 机主在 `extmenu1b` / `extsnd1` / `extboot1` / `zfc_all1b` 上初测未报告异常；仍需逐项归档独立测试记录 |
-| **静音模式自定义快门声** | 5 个固定 WAV 槽位（选中自动试听） | 机主在 `extsnd1` / `extboot1` / `zfc_all1b` 上初测未报告异常 |
-| **自定义画幅套件 + EVF 加速 + 视频档隐藏** | 新增 5 档画幅（去 5:4，单页 8 项）、LCD/EVF 纯黑遮罩（保留 EVF UI、4 像素突发加速）、免重启回放放大修复、视频档自动隐藏遮罩 | 机主在 `zfc_all1b` 上初测拍照、遮罩与视频档切换未报告异常 |
-| **单文件配置 + 开机自恢复** | 统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复 | 机主在 `extboot1` / `zfc_all1b` 上初测开关机未报告异常；未覆盖全部显示模式与无卡/慢挂载边界 |
+| **125 分钟视频解锁** | 菜单时长上限设为 `125:00`（84 项时长表 + 引擎门限 `0x1029E088`） | `zfc_all1b` 仅测短录像，**未测超过 30 分钟录像**。更早的 `34:32` / `3.1 GB` 记录来自早期 `unlock2` / `VIDEO1` 版本（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 与 `CFW@b6d4d04:research/nikon_zfc/snapshots/zfc-v2-20261127/README.md`，公开仓未附单组件原始日志）；`125` 分钟满程、`4 GiB` 边界与 `4K` 长录均未验证 |
+| **慢动作上限 3 → 25 分钟** | 菜单时长上限设为 `25:00`（`0x102A0470`） | 更早的 `10` 分钟录像记录来自 `slowmo25`（固定出处：`zfc-patchkit@10d619b:CHANGELOG.md`、`docs/MILESTONE-2026-10-25.md`）；`25` 分钟满程未验证 |
+| **4K / 1080p 品质与码率菜单** | 解锁视频品质菜单（高 / 标准）+ `qmenu_rates` | **`zfc_all1b` 未测不同画质档位的码率**。更早的 5 种 MP4 模式记录来自早期 `qs8` 组件（总述见 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`，公开仓未附单组件原始日志）；MOV 未测 |
+| **自定义画幅套件 + EVF 加速 + 视频档自动隐藏** | 新增 5 档画幅（去 5:4，单页 8 项）、LCD/EVF 纯黑遮罩（保留 EVF UI、4 像素突发加速）、免重启回放放大、视频档自动隐藏遮罩 | 机主在 `zfc_all1b` 上实测拍照、画幅遮罩及**切到视频档自动隐藏 / 切回拍照档恢复**未报告异常 |
+| **静音模式自定义快门声** | 5 个固定 WAV 槽位（选中自动试听） | 机主在 `zfc_all1b` 上实测自定义快门声未报告异常；早期 `extsnd1` / `extboot1` 仅有 `zfc-research@e77cb5c` 总述、缺少对应独立实机测试报告（该部分历史归因：**尚未确认**） |
+| **统一设定菜单入口 + 独立拍照斑马纹** | 设定菜单底部扩展入口（冷启动直显文字）+ 独立拍照斑马纹 | **尚未确认**：`zfc_all1b` 本轮初测记录未单独涵盖这两项；早期 `extmenu1b` / `extsnd1` / `extboot1` 仅在 `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md` 有总述，缺少对应的独立实机测试报告文件 |
+| **单文件配置与开机自恢复** | 统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复 | **尚未确认**：`zfc_all1b` 的「开关机正常」观察仅覆盖开关机本身，不等价于配置自恢复实测；`zfc-research@e77cb5c:notes/EXTBOOT1-REPORT.md` 为刷前离线报告（`camera_verified: false`），缺少 `extboot1` / `zfc_all1b` 的配置恢复独立实机报告 |
 
 ## 快速开始
 
@@ -89,11 +89,12 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
 > This repository ships **no complete Nikon firmware image**. Obtain the official `Z_fc_0181.bin` yourself; the scripts verify its SHA-256 before building.  
 > **Scope limit on `patches/zfc-v2.json`**: In commit `a199576`, all 48 target-window checks use `expected_sha256` (no raw stock `expected` bytes), and 239 contiguous runs >= 12 B (9,433 B) of stock menu/profile data are read locally from the user's firmware via `copy_stock`. However, **provenance for all remaining 213 `write` records and 48 `replacement` records is not yet fully closed** (`<12 B` stock fragments may still exist inside stock-derived table gaps). See [docs/V2-PROVENANCE.md](docs/V2-PROVENANCE.md). The repository's MIT license covers only original project code and documentation and grants no rights to Nikon firmware, resources, or trademarks.
 
-## Owner Initial Test Scope & Earlier Video Reports
+## Owner Initial Test Scope & Attribution Boundaries
 
-- **Owner initial test on `zfc_all1b`** (photo-focused): power cycling, still photography, custom aspect-ratio masks (including Movie-mode auto-hide / Photo-mode restore), custom shutter sound, and short video clips reported no issues.
+- **Owner initial test on `zfc_all1b`** (photo-focused): power cycling (covers power-on/off only), still photography, custom aspect-ratio masks (including Movie-mode auto-hide and Photo-mode restore), custom shutter sound, and short video clips reported no issues.
 - **Untested on `zfc_all1b`**: recordings longer than 30 minutes and bitrate measurements across different quality levels.
-- **Earlier video measurements (separate earlier builds)**: the `34:32` / `3.1 GB` recording (`unlock2` / `VIDEO1`), `10`-minute slow-motion clip (`slowmo25`), and 5 MP4 quality modes (`qs8`) belong to earlier component/video research builds, not full-duration runs on `zfc_all1b`. Full 125 min, 4 GiB boundary, long 4K recording, full 25 min slow-motion, and MOV remain untested.
+- **Items lacking standalone archived live reports (尚未确认 / unconfirmed attribution)**: independent photo zebra, unified setup menu, cold-boot config auto-restore (`A:\ZFCEXT.CFG`), and per-build live observations on `extmenu1b` / `extsnd1` / `extboot1` (summarized in `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`; `EXTBOOT1-REPORT.md` is a pre-flash offline report with `camera_verified: false`).
+- **Earlier video measurements (separate earlier builds)**: the `10`-minute slow-motion clip (`slowmo25`, archived in `zfc-patchkit@10d619b:CHANGELOG.md`), and the `34:32` / `3.1 GB` recording (`unlock2`) and 5 MP4 quality modes (`qs8`, summarized in `zfc-research@e77cb5c:notes/ZFC-V2-ARCHITECTURE-AND-RESULTS-2026-11-27.md`). Full 125 min, 4 GiB boundary, long 4K recording, full 25 min slow-motion, and MOV remain untested.
 
 ## Quick start
 

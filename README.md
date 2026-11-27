@@ -77,6 +77,7 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
 ## 验证记录与回退边界
 
 - **验证记录**：`a199576` 的作者本地 `verify_release.py` 7/7 复现日志归档于 [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md)（作者本地报告）；既有离线门禁报告记录 0 项违规、27 项 2 字节零填充警告（仅归属该旧报告）。`a199576` 的第三方独立验证暂延后。
+- **长录发热与使用风险**：解除 29:59 录制时长限制（最高 125 分钟）、提升慢动作时长上限或使用高码率录制时，**长时间连续录像会导致机身与存储卡显著发热**（Z fc 无主动散热风扇，可能触发相机原厂过热保护自动停录或缩短电池续航）。请根据环境温度、散热条件与实际拍摄需求自行判断并承担使用风险。
 - **回退观察与救援边界**：在相机**能够正常开机、电池电量充足（≥ 50%）且能够正常进入「设定菜单 → 固件版本 → 版本升级」**的条件下，先前测试观察到可通过 SD 卡重刷原厂 `EG198581.BIN` 回退。原厂镜像的存在**不能保证一定能够回退成功**；**如果相机无法启动或无法进入升级菜单，目前缺少可靠的 USB 或硬件救援证据**（USB 协议栈位于被替换的 `eg` 模块内）。升级过程中切勿断电或中断。
 
 ## 参考与致谢
@@ -126,6 +127,7 @@ python tools/patch.py --input Z_fc_0181.bin --spec patches/zfc-v2.json \
 ## Verification & Rollback Boundaries
 
 - **Verification**: Author local `verify_release.py` log for `a199576` is archived at [docs/V2-LOCAL-VERIFY-a199576.md](docs/V2-LOCAL-VERIFY-a199576.md) (7/7 MATCH, target `b5c6e75e…61f8`); saved offline gate report recorded 0 violations and 27 two-byte zero-padding warnings. Independent third-party verification is deferred.
+- **Thermal & extended recording risk**: Extended continuous video recording (125-minute unlock, 25-minute slow-motion, or high-bitrate modes) **causes significant body and SD card heating** (the Z fc has no active cooling fan and may trigger stock thermal shutdown). Please assess ambient temperature and hardware risks at your own discretion.
 - **Rollback limits**: Re-flashing stock `EG198581.BIN` has been observed to work **only when the camera boots normally and can enter the firmware update menu** (battery >= 50%). Having a stock file does **not** guarantee recovery; **there is no reliable recovery evidence if the camera fails to boot or cannot open the update menu**.
 
 ## Credits & License

@@ -2,8 +2,8 @@
 
 ## [2.0] - 2026-11-27
 
-Official v2.0 release (`zfc-v2` / research build `zfc_all1b`, target size `35,060,342` B,
-SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8`).
+Official v2.0 release (`zfc-v2` / `zfc_all1b_bi` auto-bilingual, target size `35,060,966` B,
+SHA-256 `cfaf2e4848ffe96757aef71ca1f9eaaf58482c351d57250d4fa7f35208e38d5a`; supersedes initial `zfc_all1b` `b5c6e75e...` with live Simplified Chinese / clean English auto-switching via `PROP_GET(0x1400)`).
 
 ### Added
 - **Complete Custom Aspect Ratio suite + EVF Burst Speedup + Movie Auto-Hide**: 5 custom ratios (`2.35:1`, `1.85:1`, `4:3`, `2:1`, `65:24 XPAN`; `5:4` removed, all 8 items on Page 1), LCD + EVF pure-black Live View masks with EVF UI preservation and 4-pixel `ldmia`/`stmia` burst speedup, no-reboot playback zoom repair, and automatic mask hide in Movie mode / restore in Photo mode.

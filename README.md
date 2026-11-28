@@ -6,7 +6,7 @@
 
 # 简体中文
 
-**`v2.0`（`zfc-v2` / 研究代号 `zfc_all1b`）是 Nikon Z fc（C 1.81，EXPEED 6）的正式发布版本。**
+**`v2.0`（`zfc-v2` / 研究代号 `zfc_all1b_bi`）是 Nikon Z fc（C 1.81，EXPEED 6）的正式发布版本（单固件支持中/英双语自动切换）。**
 
 路线：基于用户自行提供的官方 `Z_fc_0181.bin` 提取主模块 `eg` → 应用补丁与扩展配方 → 重算模块 CRC16 → 命名 `EG198581.BIN` → 放 SD 卡根目录 → 相机「设定菜单 → 固件版本 → 版本升级」。**纯 Python 标准库，零第三方依赖。**
 
@@ -18,7 +18,7 @@
 相比 `v1`（仅含慢动作 25 分钟、1080p 码率提升与复用视频开关的拍照斑马纹），**`v2.0`（`zfc-v2`）是一次完整大版本升级**：
 
 1. **完整自定义画幅套件 + EVF 加速 + 视频档自动隐藏**：新增 `2.35:1`、`1.85:1`、`4:3`、`2:1`、`65:24 XPAN`（移除 `5:4`，全部 8 项单页显示）；LCD + EVF 双屏纯黑实时取景遮罩（保留 EVF UI，4 像素 `ldmia`/`stmia` 突发加速切换约 1 秒）；免重启回放 1/2/3 级放大修复；**切到视频档自动隐藏遮罩，切回拍照档立刻恢复**。
-2. **设定菜单底部统一扩展入口 + 独立拍照斑马纹**：冷启动直显文字，拍照模式高亮显示（斑马纹）与视频模式斑马纹完全独立。
+2. **设定菜单底部统一扩展入口 + 独立拍照斑马纹 + 中/英双语自动切换**：冷启动直显文字，拍照模式高亮显示（加亮显示）与视频模式斑马纹完全独立；**单固件内置中/英双语**，自动跟随相机原生「语言 / Language」设置实时切换（简体中文显示「影像区域 / 扩展功能 / 拍照加亮显示 / 自定义快门声」，其他语言自动显示干净英文，无 `(UI test)` 残留）。
 3. **静音模式自定义快门声**：支持 5 个固定 WAV 槽位（`ZFC\SHUTTER.WAV`、`1.WAV`~`4.WAV`），菜单选中即自动试听。
 4. **全项目单一配置文件 + 开机自动恢复**：画幅、拍照斑马纹、自定义快门声统一保存于 `A:\ZFCEXT.CFG`，开机自动恢复，无需先进菜单。
 5. **视频功能整合**：125 分钟视频录制时长解锁（`unlock2`，不含慢动作）、慢动作 3 → 25 分钟（`slowmo25`）、视频品质菜单解锁 + 4K / 1080p 可调码率（`qs8`）。
@@ -29,7 +29,7 @@
 | 项 | 值 |
 |---|---|
 | 机型 / 固件 | Nikon Z fc · C 1.81（官方容器 `Z_fc_0181.bin`，35,578,974 B，SHA-256 `e4cd838a…bd1b6`） |
-| 当前正式版 | **`v2.0`（`zfc-v2` / `zfc_all1b`）**，目标大小 `35,060,342` B，SHA-256 `b5c6e75ee6cbb09a98226e7bc928cdc4b4d05bd9d80df6fb1b180b26ea8161f8` |
+| 当前正式版 | **`v2.0`（`zfc-v2` / `zfc_all1b_bi` 中英双语版）**，目标大小 `35,060,966` B，SHA-256 `cfaf2e4848ffe96757aef71ca1f9eaaf58482c351d57250d4fa7f35208e38d5a` |
 | 上一版本 | `v1`（`zfc-v1`，SHA-256 `2c9cc3a9…ec161`），仓库继续保留全部 v1 规格 |
 
 ## 实测范围与未测边界
@@ -97,7 +97,7 @@ Pure Python standard library (zero third-party dependencies). Patch `eg` from yo
 ## What's New in v2.0 (`zfc-v2`)
 
 1. **Complete Custom Aspect Ratio Suite + EVF Burst Speedup + Movie Auto-Hide**: adds `2.35:1`, `1.85:1`, `4:3`, `2:1`, `65:24 XPAN` (removes `5:4`, all 8 items on Page 1); pure-black LCD + EVF masks (EVF UI preserved, 4-pixel `ldmia`/`stmia` burst speedup ~1 s switch); no-reboot playback zoom fix; **auto-hides in Movie mode and restores in Photo mode**.
-2. **Unified Setup Menu Entry + Independent Photo Zebra**: cold-boot text rendering; Photo-mode highlight display is fully independent of Movie zebra.
+2. **Unified Setup Menu Entry + Independent Photo Zebra + Auto-Bilingual UI**: cold-boot text rendering; Photo-mode highlight display is fully independent of Movie zebra; **single firmware automatically switches between Simplified Chinese and clean English** following the camera's native Language setting (`PROP_GET(0x1400) == 26`).
 3. **Silent-Mode Custom Shutter Sound**: 5 fixed WAV slots (`ZFC\SHUTTER.WAV`, `1.WAV`..`4.WAV`) with auto-preview on select.
 4. **Unified Config (`A:\ZFCEXT.CFG`) + Cold-Boot Auto-Restore**: stores Aspect Ratio, Photo Zebra, and Shutter Sound in one file and restores automatically on power-on.
 5. **Video Suite**: 125-minute recording unlock (`unlock2`), 3 → 25 min slow-motion (`slowmo25`), and Movie Quality menu + 4K/1080p adjustable bitrate (`qs8`).
